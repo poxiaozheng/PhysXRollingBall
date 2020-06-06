@@ -46,7 +46,7 @@ void createTrack(const PxTransform& t, PxReal halfExtent)
 
 void createObstacle(const PxTransform& t, PxReal halfExtent)
 {
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, 0.8), *gMaterial);
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(0.6, halfExtent * 0.6, 6), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
 	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
@@ -139,12 +139,20 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'B':
 				stackZ = 12.0f;
 				for (PxU32 i = 0; i < 40; i++) {
-					createObstacle(PxTransform(PxVec3(-5, 0, stackZ -= 12.0f)), 2.0f);
+					createObstacle(PxTransform(PxVec3(-7.6, 0, stackZ -= 12.0f)), 2.0f);
+				}
+				stackZ = 12.0f;
+				for (PxU32 i = 0; i < 40; i++) {
+					createObstacle(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
 				}
 				break;
 	case ' ':	createBall(PxTransform(PxVec3(-12.5, 0, -0.1f)), 1.0f);
 				createBall(PxTransform(PxVec3(-17.5, 0, -0.1f)), 1.0f);
 				break;
+	case 'R':   
+		stackZ = 12.0f;
+		cleanupPhysics(true);
+		initPhysics(true);
 	}
 }
 int run(int argc, const char** argv)

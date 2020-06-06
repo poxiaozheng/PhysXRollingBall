@@ -313,7 +313,7 @@ namespace Snippets
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
 				if (sleeping)
 				{
-					PxVec3 darkColor = color * 0.25f;
+					PxVec3 darkColor = color * 1.0f;
 					glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
 				}
 				else
