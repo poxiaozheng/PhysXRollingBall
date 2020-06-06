@@ -69,7 +69,8 @@ namespace
 
 void renderLoop()
 {
-	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
+	sCamera = new Snippets::Camera(PxVec3(-18.0f, 8.0f, 9.0f), PxVec3(-0.2f, -0.6f, -1.3f));
+	//Camera eye:左右、上下、前后
 
 	Snippets::setupDefaultWindow("RollingBall");
 	Snippets::setupDefaultRenderState();

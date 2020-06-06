@@ -19,7 +19,7 @@ PxMaterial* gMaterial = NULL;
 
 PxPvd* gPvd = NULL;
 
-PxReal stackZ = 10.0f;
+PxReal stackZ = 12.0f;
 
 extern void renderLoop();
 
@@ -32,20 +32,27 @@ PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, 
 	return dynamic;
 }
 
-void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
+void createStack(const PxTransform& t, PxReal halfExtent)
 {
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, 0.1), *gMaterial);
-	for (PxU32 i = 0; i < size; i++)
-	{
-		for (PxU32 j = 0; j < size - i; j++)
-		{
-			PxTransform localTm(PxVec3(PxReal(j * 2) - PxReal(size - i), PxReal(i * 2 + 1), 0) * halfExtent);
-			PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
-			body->attachShape(*shape);
-			PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-			gScene->addActor(*body);
-		}
-	}
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, 0.1, halfExtent * 3), *gMaterial);
+	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
+	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	gScene->addActor(*body);
+
+	shape->release();
+}
+void createBall(const PxTransform& t, PxReal halfExtent)
+{
+	
+	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *gMaterial);
+	PxTransform localTm(PxVec3(PxReal(0) - PxReal(4), PxReal(1), 0) * halfExtent);
+	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	gScene->addActor(*body);
+
 	shape->release();
 }
 
@@ -78,11 +85,17 @@ void initPhysics(bool interactive)
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	gScene->addActor(*groundPlane);
 
-	for (PxU32 i = 0; i < 5; i++)
-		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
+	for (PxU32 i = 0; i < 40; i++) {
+		createStack(PxTransform(PxVec3(0, 0, stackZ -= 12.0f)), 2.0f);
+	}
+	stackZ = 12.0f;
+	for (PxU32 i = 0; i < 40; i++) {
+		createStack(PxTransform(PxVec3(-5, 0, stackZ -= 12.0f)), 2.0f);
+	}
+	
 
-	if (!interactive)
-		createDynamic(PxTransform(PxVec3(0, 40, 100)), PxSphereGeometry(10), PxVec3(0, -50, -100));
+	/*if (!interactive)
+		createDynamic(PxTransform(PxVec3(0, 40, 100)), PxSphereGeometry(10), PxVec3(0, -50, -100));*/
 }
 
 void stepPhysics(bool interactive)
@@ -104,15 +117,17 @@ void cleanupPhysics(bool interactive)
 
 	gFoundation->release();
 
-	printf("SnippetHelloWorld done.\n");
 }
 
 void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch (toupper(key))
 	{
-	case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);						break;
-	case ' ':	createDynamic(camera, PxSphereGeometry(3.0f), camera.rotate(PxVec3(0, 0, -1)) * 200);	break;
+	case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 2.0f);
+				break;
+	case ' ':	createBall(PxTransform(PxVec3(-12.5, 0, -0.1f)), 1.0f);
+				createBall(PxTransform(PxVec3(-17.5, 0, -0.1f)), 1.0f);
+				break;
 	}
 }
 int run(int argc, const char** argv)
