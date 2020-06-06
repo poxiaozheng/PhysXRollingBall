@@ -1,0 +1,2 @@
+C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\x64\Debug\RollingBall.exe
+C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\x64\Debug\RollingBall.pdb
