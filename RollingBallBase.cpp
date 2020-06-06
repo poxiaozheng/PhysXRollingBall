@@ -23,29 +23,42 @@ PxReal stackZ = 12.0f;
 
 extern void renderLoop();
 
-PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
-{
-	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
-	dynamic->setAngularDamping(0.5f);
-	dynamic->setLinearVelocity(velocity);
-	gScene->addActor(*dynamic);
-	return dynamic;
-}
+//PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
+//{
+//	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
+//	dynamic->setAngularDamping(0.5f);
+//	dynamic->setLinearVelocity(velocity);
+//	gScene->addActor(*dynamic);
+//	return dynamic;
+//}
 
-void createStack(const PxTransform& t, PxReal halfExtent)
+void createTrack(const PxTransform& t, PxReal halfExtent)
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, 0.1, halfExtent * 3), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
 	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
-	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	PxRigidBodyExt::updateMassAndInertia(*body, 100.0f);
 	gScene->addActor(*body);
 
 	shape->release();
 }
+
+void createObstacle(const PxTransform& t, PxReal halfExtent)
+{
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, 0.8), *gMaterial);
+	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
+	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 300.0f);
+	gScene->addActor(*body);
+
+	shape->release();
+}
+
 void createBall(const PxTransform& t, PxReal halfExtent)
 {
-	
+
 	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(4), PxReal(1), 0) * halfExtent);
 	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
@@ -55,6 +68,7 @@ void createBall(const PxTransform& t, PxReal halfExtent)
 
 	shape->release();
 }
+
 
 void initPhysics(bool interactive)
 {
@@ -86,14 +100,13 @@ void initPhysics(bool interactive)
 	gScene->addActor(*groundPlane);
 
 	for (PxU32 i = 0; i < 40; i++) {
-		createStack(PxTransform(PxVec3(0, 0, stackZ -= 12.0f)), 2.0f);
+		createTrack(PxTransform(PxVec3(0, 0, stackZ -= 12.0f)), 2.0f);
 	}
 	stackZ = 12.0f;
 	for (PxU32 i = 0; i < 40; i++) {
-		createStack(PxTransform(PxVec3(-5, 0, stackZ -= 12.0f)), 2.0f);
+		createTrack(PxTransform(PxVec3(-5, 0, stackZ -= 12.0f)), 2.0f);
 	}
 	
-
 	/*if (!interactive)
 		createDynamic(PxTransform(PxVec3(0, 40, 100)), PxSphereGeometry(10), PxVec3(0, -50, -100));*/
 }
@@ -123,7 +136,11 @@ void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch (toupper(key))
 	{
-	case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 2.0f);
+	case 'B':
+				stackZ = 12.0f;
+				for (PxU32 i = 0; i < 40; i++) {
+					createObstacle(PxTransform(PxVec3(-5, 0, stackZ -= 12.0f)), 2.0f);
+				}
 				break;
 	case ' ':	createBall(PxTransform(PxVec3(-12.5, 0, -0.1f)), 1.0f);
 				createBall(PxTransform(PxVec3(-17.5, 0, -0.1f)), 1.0f);

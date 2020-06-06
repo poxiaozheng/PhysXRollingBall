@@ -1,7 +1,7 @@
 ﻿cl : 命令行 warning D9025: 正在重写“/sdl-”(用“/GS-”)
   RollingBallBase.cpp
-C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(59,23): warning C4100: “interactive”: 未引用的形参
-C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(122,53): warning C4100: “camera”: 未引用的形参
-C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(133,32): warning C4100: “argv”: 未引用的形参
-C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(133,13): warning C4100: “argc”: 未引用的形参
+C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(73,23): warning C4100: “interactive”: 未引用的形参
+C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(137,53): warning C4100: “camera”: 未引用的形参
+C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(152,32): warning C4100: “argv”: 未引用的形参
+C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\RollingBallBase.cpp(152,13): warning C4100: “argc”: 未引用的形参
   RollingBall.vcxproj -> C:\Users\zoom\Desktop\大三下暑期实训\RollingBall\x64\Debug\RollingBall.exe
