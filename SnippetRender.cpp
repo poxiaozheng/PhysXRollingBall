@@ -58,11 +58,13 @@ void renderGeometry(const PxGeometryHolder& h)
 	{
 		glScalef(h.box().halfExtents.x, h.box().halfExtents.y, h.box().halfExtents.z);
 		glutSolidCube(2.0);
+		//glColor4d(0.3, 0.6, 0.7, 1);
 	}
 	break;
 	case PxGeometryType::eSPHERE:
 	{
 		glutSolidSphere(GLdouble(h.sphere().radius), 10, 10);
+		//glColor4d(0.5, 0.4, 0.6, 1);
 	}
 	break;
 	case PxGeometryType::eCAPSULE:
@@ -117,7 +119,6 @@ void renderGeometry(const PxGeometryHolder& h)
 		{
 			PxHullPolygon data;
 			mesh->getPolygonData(i, data);
-
 			const PxU32 nbTris = PxU32(data.mNbVerts - 2);
 			const PxU8 vref0 = polygons[data.mIndexBase + 0];
 			PX_ASSERT(vref0 < nbVerts);

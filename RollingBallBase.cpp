@@ -32,7 +32,7 @@ extern void renderLoop();
 //	return dynamic;
 //}
 
-void createTrack(const PxTransform& t, PxReal halfExtent)
+void createTrack(const PxTransform& t, PxReal halfExtent)  //创建轨道
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, 0.1, halfExtent * 3), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
@@ -44,7 +44,18 @@ void createTrack(const PxTransform& t, PxReal halfExtent)
 	shape->release();
 }
 
-void createObstacle(const PxTransform& t, PxReal halfExtent)
+void createObstacle(const PxTransform& t, PxReal halfExtent)//创建障碍物
+{
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, 0.6), *gMaterial);
+	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
+	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 300.0f);
+	gScene->addActor(*body);
+
+	shape->release();
+}
+void createRailing(const PxTransform& t, PxReal halfExtent)//创建轨道两边栏杆
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(0.6, halfExtent * 0.6, 6), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
@@ -56,9 +67,8 @@ void createObstacle(const PxTransform& t, PxReal halfExtent)
 	shape->release();
 }
 
-void createBall(const PxTransform& t, PxReal halfExtent)
+void createBall(const PxTransform& t, PxReal halfExtent) //创建小球
 {
-
 	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(4), PxReal(1), 0) * halfExtent);
 	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
@@ -138,17 +148,27 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	{
 	case 'B':
 				stackZ = 12.0f;
-				for (PxU32 i = 0; i < 40; i++) {
-					createObstacle(PxTransform(PxVec3(-7.6, 0, stackZ -= 12.0f)), 2.0f);
+				for (PxU32 i = 0; i < 60; i++) {
+					createRailing(PxTransform(PxVec3(-7.6, 0, stackZ -= 12.0f)), 2.0f);
 				}
 				stackZ = 12.0f;
-				for (PxU32 i = 0; i < 40; i++) {
-					createObstacle(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
+				for (PxU32 i = 0; i < 60; i++) {
+					createRailing(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
 				}
 				break;
 	case ' ':	createBall(PxTransform(PxVec3(-12.5, 0, -0.1f)), 1.0f);
 				createBall(PxTransform(PxVec3(-17.5, 0, -0.1f)), 1.0f);
 				break;
+	/*case 'O':
+		stackZ = 12.0f;
+		for (PxU32 i = 0; i < 30; i++) {
+			createObstacle(PxTransform(PxVec3(-7.6, 0, stackZ -= 18.0f)), 2.0f);
+		}
+		stackZ = 12.0f;
+		for (PxU32 i = 0; i < 30; i++) {
+			createObstacle(PxTransform(PxVec3(-7.6, 0, stackZ -= 18.0f)), 2.0f);
+		}
+		break;*/
 	case 'R':   
 		stackZ = 12.0f;
 		cleanupPhysics(true);
