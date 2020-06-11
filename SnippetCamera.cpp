@@ -34,7 +34,7 @@
 #include "foundation/PxMat33.h"
 
 using namespace physx;
-
+PxVec3 front(0, 0, -1);
 namespace Snippets
 {
 
@@ -54,6 +54,12 @@ namespace Snippets
 		mMouseY = y;
 	}
 
+	void Camera::goFront()
+	{
+		
+		mEye += front;
+	}
+
 	bool Camera::handleKey(unsigned char key, int x, int y, float speed)
 	{
 		PX_UNUSED(x);
@@ -62,10 +68,10 @@ namespace Snippets
 		PxVec3 viewY = mDir.cross(PxVec3(0, 1, 0)).getNormalized();
 		switch (toupper(key))
 		{
-		case 'W':	mEye += mDir * 2.0f * speed;		break;
-		case 'S':	mEye -= mDir * 2.0f * speed;		break;
-		case 'A':	mEye -= viewY * 2.0f * speed;		break;
-		case 'D':	mEye += viewY * 2.0f * speed;		break;
+		case 'W':	mEye += front * speed;		break;
+		case 'S':	mEye -= front * speed;		break;
+		case 'A':	mEye -= viewY * speed;		break;
+		case 'D':	mEye += viewY * speed;		break;
 		default:							return false;
 		}
 		return true;

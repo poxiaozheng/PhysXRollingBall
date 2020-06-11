@@ -50,6 +50,9 @@ static float gCylinderData[] = {
 #define MAX_NUM_MESH_VEC3S  1024
 static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
 
+int WINDOW_WIDTH = 512;
+int WINDOW_HEIGHT = 512;
+
 void renderGeometry(const PxGeometryHolder& h)
 {
 	switch (h.getType())
@@ -245,7 +248,7 @@ namespace Snippets
 
 		glutInit(&argc, argv);
 
-		glutInitWindowSize(512, 512);
+		glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 		int mainHandle = glutCreateWindow(name);
 		glutSetWindow(mainHandle);
@@ -286,9 +289,16 @@ namespace Snippets
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
+		//gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
+		gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
 
 		glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
+	}
+
+	void renderGameOver(const char text[], int len) 
+	{
+
+		renderText(190,250,text,len);
 	}
 
 	void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3& color)
@@ -299,7 +309,7 @@ namespace Snippets
 			const PxU32 nbShapes = actors[i]->getNbShapes();
 			PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
 			actors[i]->getShapes(shapes, nbShapes);
-			bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
+			//bool sleeping = actors[i]->is<PxRigidStatic>() ? true : false;
 
 			for (PxU32 j = 0; j < nbShapes; j++)
 			{
@@ -312,13 +322,13 @@ namespace Snippets
 				// render object
 				glPushMatrix();
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
-				if (sleeping)
-				{
-					PxVec3 darkColor = color * 1.0f;
-					glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
-				}
-				else
-					glColor4f(color.x, color.y, color.z, 1.0f);
+				//if (sleeping)
+				//{
+				//	PxVec3 darkColor = color * 1.0f;
+				//	glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
+				//}
+				//else
+				glColor4f(color.x, color.y, color.z, 1.0f);
 				renderGeometry(h);
 				glPopMatrix();
 
@@ -344,6 +354,25 @@ namespace Snippets
 	void finishRender()
 	{
 		glutSwapBuffers();
+	}
+	void renderText(int x, int y, const char text[], int len)
+	{
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+
+		glLoadIdentity();
+		glRasterPos2i(x, y);
+		for (int i = 0; i < len; ++i) {
+			glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, text[i]);
+		}
+		glPopMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
 	}
 } //namespace Snippets
 
