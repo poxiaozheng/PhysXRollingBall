@@ -54,8 +54,11 @@ namespace
 		if (nbActors)
 		{
 			std::vector<PxRigidActor*> actors(nbActors);
-			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
+			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]),nbActors);
+			Snippets::renderActors(&actors[0], static_cast<PxU32>(1), true,PxVec3(1.0f,0.0f,1.0f));
+			Snippets::renderActors(&actors[1], static_cast<PxU32>(1), true, PxVec3(1.0f, 1.0f, 1.0f));
+			Snippets::renderActors(&actors[2], static_cast<PxU32>(1), true, PxVec3(0.7f, 0.9f, 0.9f));
+			Snippets::renderActors(&actors[3], static_cast<PxU32>(actors.size()-3), true, PxVec3(0.5f, 0.5f, 0.5f));
 		}
 		Snippets::finishRender();
 	}
