@@ -56,8 +56,7 @@ namespace Snippets
 
 	void Camera::goFront()
 	{
-		
-		mEye += front;
+		mEye += front*2;
 	}
 
 	bool Camera::handleKey(unsigned char key, int x, int y, float speed)

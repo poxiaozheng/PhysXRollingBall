@@ -1,9 +1,9 @@
 #include <ctype.h>
-
+#include<stdio.h>
+#include<stdlib.h>
 #include <PxPhysicsAPI.h>
 #include <extensions/PxDefaultAllocator.h>
 #include "Header/Utils/SnippetPVD.h"
-
 
 using namespace physx;
 
@@ -29,6 +29,8 @@ bool GAME_OVER = false;
 bool GAME_START = false;
 
 extern void renderLoop();
+
+int obstaclePosition[2] = { 0,-5 };
 
 //PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
 //{
@@ -82,9 +84,6 @@ static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //创建小
 	body->setAngularDamping(0.f);*/
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
 	gScene->addActor(*body);
-
-
-
 	shape->release();
 	return body;
 }
@@ -119,6 +118,7 @@ void initPhysics(bool interactive)
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	gScene->addActor(*groundPlane);
 
+	//创建两条轨道
 	for (PxU32 i = 0; i < 2000; i++) {
 		createTrack(PxTransform(PxVec3(0, 0, stackZ -= 12.0f)), 2.0f);
 	}
@@ -126,6 +126,26 @@ void initPhysics(bool interactive)
 	for (PxU32 i = 0; i < 2000; i++) {
 		createTrack(PxTransform(PxVec3(-5, 0, stackZ -= 12.0f)), 2.0f);
 	}
+
+	//生成轨道两边栏杆
+	stackZ = 12.0f;
+	for (PxU32 i = 0; i < 2000; i++) {
+		createRailing(PxTransform(PxVec3(-7.6, 0, stackZ -= 12.0f)), 2.0f);
+
+	}
+	stackZ = 12.0f;
+	for (PxU32 i = 0; i < 2000; i++) {
+		createRailing(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
+	}
+
+	//障碍物随机生成
+	stackZ = 24.0f;
+	for (PxU32 i = 0; i < 1000; i++) {
+		int obstacleP = obstaclePosition[rand() % 2];
+		int obstacleDistance = rand() % 50 + 15;
+		createObstacle(PxTransform(PxVec3(obstacleP, 0, stackZ -= obstacleDistance)), 2.0f);
+	}
+
 }
 
 void stepPhysics(bool interactive)
@@ -152,54 +172,22 @@ void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch (toupper(key))
 	{
-	case 'B':
-		stackZ = 12.0f;
-		for (PxU32 i = 0; i < 1600; i++) {
-			createRailing(PxTransform(PxVec3(-7.6, 0, stackZ -= 12.0f)), 2.0f);
-			//createObstacle(PxTransform(PxVec3(-5.0, 0, stackZ -= 12.0f)), 2.0f);
-		}
-		stackZ = 12.0f;
-		for (PxU32 i = 0; i < 1600; i++) {
-			createRailing(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
-			//createObstacle(PxTransform(PxVec3(0.0, 0, stackZ -= 12.0f)), 2.0f);
-		}
-		stackZ = 48.0f;
-		for (PxU32 i = 0; i < 160; i++) {
-			//createRailing(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
-			createObstacle(PxTransform(PxVec3(-5.0, 0, stackZ -= 48.0f)), 2.0f);
-		}
-		stackZ = 24.0f;
-		for (PxU32 i = 0; i < 160; i++) {
-			//createRailing(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
-			createObstacle(PxTransform(PxVec3(0.0, 0, stackZ -= 48.0f)), 2.0f);
-		}
+	
+	case 'B':createBall(PxTransform(PxVec3(-12.5, 2, -0.1f)), 1.0f);
 		break;
-	case ' ':createBall(PxTransform(PxVec3(-12.5, 2, -0.1f)), 1.0f);
-		//createBall(PxTransform(PxVec3(-17.5, 0, -0.1f)), 1.0f);
-		break;
-		/*case 'O':
-			stackZ = 12.0f;
-			for (PxU32 i = 0; i < 30; i++) {
-				createObstacle(PxTransform(PxVec3(-7.6, 0, stackZ -= 18.0f)), 2.0f);
-			}
-			stackZ = 12.0f;
-			for (PxU32 i = 0; i < 30; i++) {
-				createObstacle(PxTransform(PxVec3(-7.6, 0, stackZ -= 18.0f)), 2.0f);
-			}
-			break;*/
 	case 'R':
 		stackZ = 12.0f;
 		cleanupPhysics(true);
 		initPhysics(true);
 		break;
 		//left
-	case 'J':
-		actor0->addForce(PxVec3(-10.0f, 10.0f, 0), PxForceMode::eIMPULSE, true);
-		break;
-		//right
-	case 'K':
-		actor0->addForce(PxVec3(10.0f, 10.0f, 0), PxForceMode::eIMPULSE, true);
-		break;
+	//case 'J':
+	//	actor0->addForce(PxVec3(-10.0f, 10.0f, 0), PxForceMode::eIMPULSE, true);
+	//	break;
+	//	//right
+	//case 'K':
+	//	actor0->addForce(PxVec3(10.0f, 10.0f, 0), PxForceMode::eIMPULSE, true);
+	//	break;
 	case 'E':
 		GAME_OVER = true;
 		GAME_START = false;
