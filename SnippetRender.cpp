@@ -53,6 +53,7 @@ static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
 int WINDOW_WIDTH = 512;
 int WINDOW_HEIGHT = 512;
 
+
 void renderGeometry(const PxGeometryHolder& h)
 {
 	switch (h.getType())
@@ -67,7 +68,6 @@ void renderGeometry(const PxGeometryHolder& h)
 	case PxGeometryType::eSPHERE:
 	{
 		glutSolidSphere(GLdouble(h.sphere().radius), 10, 10);
-		//glColor4d(0.5, 0.4, 0.6, 1);
 	}
 	break;
 	case PxGeometryType::eCAPSULE:
@@ -289,15 +289,12 @@ namespace Snippets
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		//gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
 		gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
-
 		glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
 	}
 
 	void renderGameOver(const char text[], int len) 
 	{
-
 		renderText(190,250,text,len);
 	}
 
@@ -309,7 +306,7 @@ namespace Snippets
 			const PxU32 nbShapes = actors[i]->getNbShapes();
 			PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
 			actors[i]->getShapes(shapes, nbShapes);
-			//bool sleeping = actors[i]->is<PxRigidStatic>() ? true : false;
+			bool isBall = actors[i]->is<PxRigidDynamic>(); // 检测是不是小球
 
 			for (PxU32 j = 0; j < nbShapes; j++)
 			{
@@ -331,7 +328,6 @@ namespace Snippets
 				glColor4f(color.x, color.y, color.z, 1.0f);
 				renderGeometry(h);
 				glPopMatrix();
-
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 				if (shadows)

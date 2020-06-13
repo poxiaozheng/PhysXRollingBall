@@ -22,7 +22,6 @@ PxPvd* gPvd = NULL;
 
 PxReal stackZ = 12.0f;
 
-PxRigidBody* actor0 = NULL;
 
 bool GAME_OVER = false;
 
@@ -31,6 +30,10 @@ bool GAME_START = false;
 extern void renderLoop();
 
 int obstaclePosition[2] = { 0,-5 };
+
+PxRigidDynamic* ballReference = NULL;
+
+unsigned long long MoveFrontDistance = 0;
 
 //PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
 //{
@@ -41,7 +44,9 @@ int obstaclePosition[2] = { 0,-5 };
 //	return dynamic;
 //}
 
-void createTrack(const PxTransform& t, PxReal halfExtent)  //¥¥Ω®πÏµ¿
+//void moveBallFront 
+
+void createTrack(const PxTransform& t, PxReal halfExtent)  //ÂàõÂª∫ËΩ®ÈÅì
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, 0.1, halfExtent * 3), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
@@ -51,7 +56,7 @@ void createTrack(const PxTransform& t, PxReal halfExtent)  //¥¥Ω®πÏµ¿
 	shape->release();
 }
 
-void createObstacle(const PxTransform& t, PxReal halfExtent)//¥¥Ω®’œ∞≠ŒÔ
+void createObstacle(const PxTransform& t, PxReal halfExtent)//ÂàõÂª∫ÈöúÁ¢çÁâ©
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent * 0.6, halfExtent * 1.1, halfExtent * 0.6), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
@@ -60,7 +65,7 @@ void createObstacle(const PxTransform& t, PxReal halfExtent)//¥¥Ω®’œ∞≠ŒÔ
 	gScene->addActor(*body);
 	shape->release();
 }
-void createRailing(const PxTransform& t, PxReal halfExtent)//¥¥Ω®πÏµ¿¡Ω±ﬂ¿∏∏À
+void createRailing(const PxTransform& t, PxReal halfExtent)//ÂàõÂª∫ËΩ®ÈÅì‰∏§ËæπÊ†èÊùÜ
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(0.6, halfExtent * 0.6, 6), *gMaterial);
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
@@ -71,13 +76,14 @@ void createRailing(const PxTransform& t, PxReal halfExtent)//¥¥Ω®πÏµ¿¡Ω±ﬂ¿∏∏À
 	shape->release();
 }
 
-static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //¥¥Ω®–°«Ú
+static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //ÂàõÂª∫Â∞èÁêÉ
 {
-
 	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *gMaterial);
-	PxTransform localTm(PxVec3(PxReal(0) - PxReal(4), PxReal(1), 0) * halfExtent);
-	PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
-	body->setLinearVelocity(PxVec3(0, 0, -10.0f));
+	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
+
+	ballReference = body;
+
+	// body->setLinearVelocity(PxVec3(0, 0, -10.0f)); ‰∏çÈúÄË¶ÅÁ∫øÊÄßÂä†ÈÄüÂ∫¶ÁöÑ„ÄÇ
 	body->attachShape(*shape);
 	/*body->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	body->setAngularVelocity(PxVec3(0.f, 0.f, 5.f));
@@ -118,7 +124,7 @@ void initPhysics(bool interactive)
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	gScene->addActor(*groundPlane);
 
-	//¥¥Ω®¡ΩÃıπÏµ¿
+	//ÂàõÂª∫‰∏§Êù°ËΩ®ÈÅì
 	for (PxU32 i = 0; i < 2000; i++) {
 		createTrack(PxTransform(PxVec3(0, 0, stackZ -= 12.0f)), 2.0f);
 	}
@@ -127,7 +133,7 @@ void initPhysics(bool interactive)
 		createTrack(PxTransform(PxVec3(-5, 0, stackZ -= 12.0f)), 2.0f);
 	}
 
-	//…˙≥…πÏµ¿¡Ω±ﬂ¿∏∏À
+	//ÁîüÊàêËΩ®ÈÅì‰∏§ËæπÊ†èÊùÜ
 	stackZ = 12.0f;
 	for (PxU32 i = 0; i < 2000; i++) {
 		createRailing(PxTransform(PxVec3(-7.6, 0, stackZ -= 12.0f)), 2.0f);
@@ -138,18 +144,40 @@ void initPhysics(bool interactive)
 		createRailing(PxTransform(PxVec3(2.6, 0, stackZ -= 12.0f)), 2.0f);
 	}
 
-	//’œ∞≠ŒÔÀÊª˙…˙≥…
+	//ÈöúÁ¢çÁâ©ÈöèÊú∫ÁîüÊàê
 	stackZ = 24.0f;
 	for (PxU32 i = 0; i < 1000; i++) {
-		int obstacleP = obstaclePosition[rand() % 2];
+		int obstacleP = obstaclePosition[1]; // To demostrate 'ball can follow the camera move', let all the obstacle appear on the left.
 		int obstacleDistance = rand() % 50 + 15;
 		createObstacle(PxTransform(PxVec3(obstacleP, 0, stackZ -= obstacleDistance)), 2.0f);
 	}
 
 }
-
+// Mode 0: Place left.
+// Mode 1: Place right
+void MoveBallLeftRight(int mode)
+{
+	static float LeftRightTrackDistance = 4.5f;
+	if (ballReference != NULL)
+	{
+		auto BallPosition = ballReference->getGlobalPose();
+		BallPosition.p.x = mode ? -16.5f : -21.0f;
+		ballReference->setGlobalPose(BallPosition);
+	}
+}
+void MoveBallToFrontPoisiton()
+{
+	if (ballReference != NULL)
+	{
+		auto BallPosition = ballReference->getGlobalPose();
+		BallPosition.p.z -= 2;
+		ballReference->setGlobalPose(BallPosition);
+	}
+}
 void stepPhysics(bool interactive)
 {
+	MoveFrontDistance++;
+
 	PX_UNUSED(interactive);
 	gScene->simulate(1.0f / 60.0f);
 	gScene->fetchResults(true);
@@ -166,34 +194,33 @@ void cleanupPhysics(bool interactive)
 	transport->release();
 	gFoundation->release();
 
+	ballReference = NULL;
 }
 
 void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch (toupper(key))
 	{
-	
-	case 'B':createBall(PxTransform(PxVec3(-12.5, 2, -0.1f)), 1.0f);
+
+	case 'B': createBall(PxTransform(PxVec3(-16.5, 3, -0.1f)), 1.0f);
 		break;
 	case 'R':
 		stackZ = 12.0f;
 		cleanupPhysics(true);
 		initPhysics(true);
 		break;
-		//left
-	//case 'J':
-	//	actor0->addForce(PxVec3(-10.0f, 10.0f, 0), PxForceMode::eIMPULSE, true);
-	//	break;
-	//	//right
-	//case 'K':
-	//	actor0->addForce(PxVec3(10.0f, 10.0f, 0), PxForceMode::eIMPULSE, true);
-	//	break;
 	case 'E':
 		GAME_OVER = true;
 		GAME_START = false;
 		break;
 	case 'G':
 		GAME_START = true;
+		break;
+	case 'K':
+		MoveBallLeftRight(0);
+		break;
+	case 'L':
+		MoveBallLeftRight(1);
 		break;
 	}
 }
