@@ -17,6 +17,7 @@ PxDefaultCpuDispatcher* gDispatcher = NULL;
 PxScene* gScene = NULL;
 
 PxMaterial* gMaterial = NULL;
+PxMaterial* ballMaterial = NULL;
 
 PxPvd* gPvd = NULL;
 
@@ -34,17 +35,6 @@ int obstaclePosition[2] = { 0,-5 };
 PxRigidDynamic* ballReference = NULL;
 
 unsigned long long MoveFrontDistance = 0;
-
-//PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
-//{
-//	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
-//	dynamic->setAngularDamping(0.5f);
-//	dynamic->setLinearVelocity(velocity);
-//	gScene->addActor(*dynamic);
-//	return dynamic;
-//}
-
-//void moveBallFront 
 
 void createTrack(const PxTransform& t, PxReal halfExtent)  //创建轨道
 {
@@ -78,12 +68,12 @@ void createRailing(const PxTransform& t, PxReal halfExtent)//创建轨道两边�
 
 static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //创建小球
 {
-	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *gMaterial);
+	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *ballMaterial);
 	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
 
 	ballReference = body;
 
-	// body->setLinearVelocity(PxVec3(0, 0, -10.0f)); 不需要线性加速度的。
+	// body->setLinearVelocity(PxVec3(0, 0, -10.0f)); 不需要线性加速度的
 	body->attachShape(*shape);
 	/*body->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	body->setAngularVelocity(PxVec3(0.f, 0.f, 5.f));
@@ -120,6 +110,8 @@ void initPhysics(bool interactive)
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	ballMaterial = gPhysics->createMaterial(0.1f, 0.1f, 0.0f);
+
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	gScene->addActor(*groundPlane);
@@ -147,7 +139,7 @@ void initPhysics(bool interactive)
 	//障碍物随机生成
 	stackZ = 24.0f;
 	for (PxU32 i = 0; i < 1000; i++) {
-		int obstacleP = obstaclePosition[1]; // To demostrate 'ball can follow the camera move', let all the obstacle appear on the left.
+		int obstacleP = obstaclePosition[rand()%2]; 
 		int obstacleDistance = rand() % 50 + 15;
 		createObstacle(PxTransform(PxVec3(obstacleP, 0, stackZ -= obstacleDistance)), 2.0f);
 	}
