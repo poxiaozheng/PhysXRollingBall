@@ -36,6 +36,46 @@ PxRigidDynamic* ballReference = NULL;
 
 unsigned long long MoveFrontDistance = 0;
 
+
+static const PxFilterData collisionGroupBall(1, 1, 1, 1);
+static const PxFilterData collisionGroupObstacle(1, 1, 1, 1);
+
+
+//碰撞过滤
+PxFilterFlags BallFilterShader(
+	PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+{
+
+	// let triggers through
+	if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+	{
+		pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
+		return PxFilterFlag::eDEFAULT;
+	}
+	// generate contacts for all that were not filtered above
+	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+
+	// trigger the contact callback for pairs (A,B) where
+	// the filtermask of A contains the ID of B and vice versa.
+	if ((filterData0.word0 & filterData1.word1) && (filterData1.word0 & filterData0.word1))
+	{
+		//如果球和障碍物碰撞的话游戏结束
+		GAME_OVER = true;
+		GAME_START = false;
+		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+	}
+
+
+
+	return PxFilterFlag::eDEFAULT;
+}
+
+
+
+
+
 void createTrack(const PxTransform& t, PxReal halfExtent)  //创建轨道
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, 0.1, halfExtent * 3), *gMaterial);
@@ -49,6 +89,7 @@ void createTrack(const PxTransform& t, PxReal halfExtent)  //创建轨道
 void createObstacle(const PxTransform& t, PxReal halfExtent)//创建障碍物
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent * 0.6, halfExtent * 1.1, halfExtent * 0.6), *gMaterial);
+	shape->setSimulationFilterData(collisionGroupObstacle);//障碍物碰撞标识
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
 	PxRigidStatic* body = gPhysics->createRigidStatic(t.transform(localTm));
 	body->attachShape(*shape);
@@ -69,6 +110,7 @@ void createRailing(const PxTransform& t, PxReal halfExtent)//创建轨道两边�
 static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //创建小球
 {
 	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *ballMaterial);
+	shape->setSimulationFilterData(collisionGroupBall);//球的碰撞标识
 	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
 
 	ballReference = body;
@@ -80,9 +122,15 @@ static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //创建
 	body->setAngularDamping(0.f);*/
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
 	gScene->addActor(*body);
+
 	shape->release();
 	return body;
 }
+
+
+
+
+
 
 
 void initPhysics(bool interactive)
@@ -99,7 +147,8 @@ void initPhysics(bool interactive)
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	gDispatcher = PxDefaultCpuDispatcherCreate(4);
 	sceneDesc.cpuDispatcher = gDispatcher;
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	//sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.filterShader = BallFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
