@@ -23,10 +23,11 @@ PxPvd* gPvd = NULL;
 
 PxReal stackZ = 12.0f;
 
-
 bool GAME_OVER = false;
 
 bool GAME_START = false;
+
+int scoreValue = 0; //游戏得分
 
 extern void renderLoop();
 
@@ -36,9 +37,9 @@ PxRigidDynamic* ballReference = NULL;
 
 unsigned long long MoveFrontDistance = 0;
 
-
 static const PxFilterData collisionGroupBall(1, 1, 1, 1);
 static const PxFilterData collisionGroupObstacle(1, 1, 1, 1);
+
 
 
 //碰撞过滤
@@ -67,14 +68,8 @@ PxFilterFlags BallFilterShader(
 		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
 	}
 
-
-
 	return PxFilterFlag::eDEFAULT;
 }
-
-
-
-
 
 void createTrack(const PxTransform& t, PxReal halfExtent)  //创建轨道
 {
@@ -96,6 +91,7 @@ void createObstacle(const PxTransform& t, PxReal halfExtent)//创建障碍物
 	gScene->addActor(*body);
 	shape->release();
 }
+
 void createRailing(const PxTransform& t, PxReal halfExtent)//创建轨道两边栏杆
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(0.6, halfExtent * 0.6, 6), *gMaterial);
@@ -189,9 +185,11 @@ void initPhysics(bool interactive)
 	stackZ = 24.0f;
 	for (PxU32 i = 0; i < 1000; i++) {
 		int obstacleP = obstaclePosition[rand()%2]; 
-		int obstacleDistance = rand() % 50 + 15;
+		int obstacleDistance = rand() % 50 + 10;   //这里可以调节游戏难度
 		createObstacle(PxTransform(PxVec3(obstacleP, 0, stackZ -= obstacleDistance)), 2.0f);
 	}
+
+	createBall(PxTransform(PxVec3(-16.5, 3, -0.1f)), 1.0f);
 
 }
 // Mode 0: Place left.
@@ -208,6 +206,7 @@ void MoveBallLeftRight(int mode)
 }
 void MoveBallToFrontPoisiton()
 {
+	scoreValue += 1; //球每次移动一单位加一分
 	if (ballReference != NULL)
 	{
 		auto BallPosition = ballReference->getGlobalPose();
@@ -218,7 +217,6 @@ void MoveBallToFrontPoisiton()
 void stepPhysics(bool interactive)
 {
 	MoveFrontDistance++;
-
 	PX_UNUSED(interactive);
 	gScene->simulate(1.0f / 60.0f);
 	gScene->fetchResults(true);
@@ -243,17 +241,11 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	switch (toupper(key))
 	{
 
-	case 'B': createBall(PxTransform(PxVec3(-16.5, 3, -0.1f)), 1.0f);
-		break;
-	case 'R':
+	/*case 'R':
 		stackZ = 12.0f;
 		cleanupPhysics(true);
 		initPhysics(true);
-		break;
-	case 'E':
-		GAME_OVER = true;
-		GAME_START = false;
-		break;
+		break;*/
 	case 'G':
 		GAME_START = true;
 		break;

@@ -5,7 +5,6 @@
 #include "Header/Utils/SnippetCamera.h"
 #include "Header/Utils/SnippetRender.h"
 #include "glut.h"
-
 using namespace physx;
 
 extern void initPhysics(bool interactive);
@@ -14,11 +13,13 @@ extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
 extern void MoveBallToFrontPoisiton();
 
-
 extern bool GAME_OVER;
 extern bool GAME_START;
 const char* GAME_OVER_TEXT = "GAME OVER";
 const int GAME_OVER_LENGTH = strlen(GAME_OVER_TEXT);
+char score[] = "Score: ";
+extern int scoreValue; //游戏得分
+char s[100]; //存放游戏得分数的char数组
 
 namespace
 {
@@ -55,9 +56,16 @@ namespace
 		{
 			sCamera->goFront();
 			MoveBallToFrontPoisiton();
+			
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
-		Snippets::renderText(10, 10, "Press B to build the ball,Press G to go", 40);
+		Snippets::renderText(10, 10, "Press G to go,Press K to left,Press L to right", 48);
+		Snippets::renderText(10, 450,score, 10);
+		snprintf(s, sizeof(s), "%d", scoreValue);
+		Snippets::renderText(100, 450, s, 5);
+		
+
+
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene, 1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
