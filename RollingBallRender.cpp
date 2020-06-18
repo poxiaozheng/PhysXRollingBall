@@ -5,6 +5,7 @@
 #include "Header/Utils/SnippetCamera.h"
 #include "Header/Utils/SnippetRender.h"
 #include "glut.h"
+#include "SoundUtils.h"
 using namespace physx;
 
 extern void initPhysics(bool interactive);
@@ -57,6 +58,7 @@ namespace
 			sCamera->goFront();
 			MoveBallToFrontPoisiton();
 			
+			
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 		Snippets::renderText(10, 10, "Press G to go,Press K to left,Press L to right", 48);
@@ -98,6 +100,8 @@ void renderLoop()
 	Snippets::setupDefaultWindow("RollingBall");
 	Snippets::setupDefaultRenderState();
 
+
+
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
 	glutKeyboardFunc(keyboardCallback);
@@ -106,7 +110,10 @@ void renderLoop()
 	motionCallback(0, 0);
 
 	atexit(exitCallback);
-
+	Sound s;
+	s.playSound();//≤•∑≈“Ù¿÷
 	initPhysics(true);
 	glutMainLoop();
+
+	
 }

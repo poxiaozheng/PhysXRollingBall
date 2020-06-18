@@ -36,6 +36,9 @@
     <ClCompile Include="SnippetRender.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="SoundUtils.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header\Utils\SnippetsUtils.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="Header\Utils\SnippetRender.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundUtils.h">
+      <Filter>Source Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
