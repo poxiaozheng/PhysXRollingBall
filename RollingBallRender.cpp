@@ -12,8 +12,10 @@ extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
-extern void MoveBallToFrontPoisiton();
+extern void MoveBallToFrontPoisiton(PxReal speed);
+extern void tryIncreaseSpeed();
 
+extern PxReal runSpeed;
 extern bool GAME_OVER;
 extern bool GAME_START;
 const char* GAME_OVER_TEXT = "GAME OVER";
@@ -55,10 +57,9 @@ namespace
 		stepPhysics(true);
 		if (GAME_START)
 		{
-			sCamera->goFront();
-			MoveBallToFrontPoisiton();
-			
-			
+			sCamera->goFront(runSpeed);
+			MoveBallToFrontPoisiton(runSpeed);
+			tryIncreaseSpeed();
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 		Snippets::renderText(10, 10, "Press G to go,Press K to left,Press L to right", 48);

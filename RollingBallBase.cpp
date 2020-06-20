@@ -5,6 +5,36 @@
 #include <extensions/PxDefaultAllocator.h>
 #include "Header/Utils/SnippetPVD.h"
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <stdint.h> // portable: uint64_t   MSVC: __int64 
+
+typedef struct timeval {
+	long tv_sec;
+	long tv_usec;
+} timeval;
+
+int gettimeofday(struct timeval* tp, struct timezone* tzp)
+{
+	// Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
+	// This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
+	// until 00:00:00 January 1, 1970 
+	static const uint64_t EPOCH = ((uint64_t)116444736000000000ULL);
+
+	SYSTEMTIME  system_time;
+	FILETIME    file_time;
+	uint64_t    time;
+
+	GetSystemTime(&system_time);
+	SystemTimeToFileTime(&system_time, &file_time);
+	time = ((uint64_t)file_time.dwLowDateTime);
+	time += ((uint64_t)file_time.dwHighDateTime) << 32;
+
+	tp->tv_sec = (long)((time - EPOCH) / 10000000L);
+	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
+	return 0;
+}
+
 using namespace physx;
 
 PxDefaultAllocator		gAllocator;
@@ -29,6 +59,11 @@ bool GAME_START = false;
 
 int scoreValue = 0; //游戏得分
 
+timeval last;
+timeval current;
+
+PxReal runSpeed = 0.6;
+
 extern void renderLoop();
 
 int obstaclePosition[2] = { 0,-5 };
@@ -40,15 +75,12 @@ unsigned long long MoveFrontDistance = 0;
 static const PxFilterData collisionGroupBall(1, 1, 1, 1);
 static const PxFilterData collisionGroupObstacle(1, 1, 1, 1);
 
-
-
 //碰撞过滤
 PxFilterFlags BallFilterShader(
 	PxFilterObjectAttributes attributes0, PxFilterData filterData0,
 	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
 	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 {
-
 	// let triggers through
 	if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
 	{
@@ -122,12 +154,6 @@ static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //创建
 	shape->release();
 	return body;
 }
-
-
-
-
-
-
 
 void initPhysics(bool interactive)
 {
@@ -204,14 +230,30 @@ void MoveBallLeftRight(int mode)
 		ballReference->setGlobalPose(BallPosition);
 	}
 }
-void MoveBallToFrontPoisiton()
+void MoveBallToFrontPoisiton(PxReal speed)
 {
 	scoreValue += 1; //球每次移动一单位加一分
 	if (ballReference != NULL)
 	{
 		auto BallPosition = ballReference->getGlobalPose();
-		BallPosition.p.z -= 2;
+		BallPosition.p.z -= speed;
 		ballReference->setGlobalPose(BallPosition);
+	}
+}
+
+void tryIncreaseSpeed() 
+{
+	if (last.tv_sec == 0)
+	{
+		gettimeofday(&last,NULL);
+		gettimeofday(&current, NULL);
+		return;
+	}
+	gettimeofday(&current,NULL);
+	if (current.tv_sec - last.tv_sec > 10)
+	{
+		runSpeed += 0.2;
+		last = current;
 	}
 }
 void stepPhysics(bool interactive)
@@ -232,8 +274,10 @@ void cleanupPhysics(bool interactive)
 	gPvd->release();
 	transport->release();
 	gFoundation->release();
-
 	ballReference = NULL;
+
+	last = timeval();
+	current = timeval();
 }
 
 void keyPress(unsigned char key, const PxTransform& camera)

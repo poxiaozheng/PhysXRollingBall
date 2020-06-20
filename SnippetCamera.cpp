@@ -32,6 +32,7 @@
 #include "Header/Utils/SnippetCamera.h"
 #include <ctype.h>
 #include "foundation/PxMat33.h"
+#include "foundation/PxTransform.h"
 
 using namespace physx;
 PxVec3 front(0, 0, -1);
@@ -54,9 +55,9 @@ namespace Snippets
 		mMouseY = y;
 	}
 
-	void Camera::goFront()
+	void Camera::goFront(float speed)
 	{
-		mEye += front*2;
+		mEye.z -= speed;
 	}
 
 	bool Camera::handleKey(unsigned char key, int x, int y, float speed)
