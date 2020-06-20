@@ -7,8 +7,6 @@
 #pragma comment(lib,"winmm.lib")
 using namespace std;
 
-
-
 class Sound {
 
 public:

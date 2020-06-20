@@ -99,7 +99,6 @@ PxFilterFlags BallFilterShader(
 		GAME_START = false;
 		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
 	}
-
 	return PxFilterFlag::eDEFAULT;
 }
 
@@ -130,7 +129,6 @@ void createRailing(const PxTransform& t, PxReal halfExtent)//创建轨道两边�
 	PxTransform localTm(PxVec3(PxReal(0) - PxReal(8.2), PxReal(1), 0) * halfExtent);
 	PxRigidStatic* body = gPhysics->createRigidStatic(t.transform(localTm));
 	body->attachShape(*shape);
-	//PxRigidBodyExt::updateMassAndInertia(*body, 300.0f);
 	gScene->addActor(*body);
 	shape->release();
 }
@@ -140,14 +138,9 @@ static PxRigidBody* createBall(const PxTransform& t, PxReal halfExtent) //创建
 	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtent), *ballMaterial);
 	shape->setSimulationFilterData(collisionGroupBall);//球的碰撞标识
 	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
-
 	ballReference = body;
 
-	// body->setLinearVelocity(PxVec3(0, 0, -10.0f)); 不需要线性加速度的
 	body->attachShape(*shape);
-	/*body->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	body->setAngularVelocity(PxVec3(0.f, 0.f, 5.f));
-	body->setAngularDamping(0.f);*/
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
 	gScene->addActor(*body);
 
@@ -211,7 +204,7 @@ void initPhysics(bool interactive)
 	stackZ = 24.0f;
 	for (PxU32 i = 0; i < 1000; i++) {
 		int obstacleP = obstaclePosition[rand()%2]; 
-		int obstacleDistance = rand() % 50 + 10;   //这里可以调节游戏难度
+		int obstacleDistance = rand() % 40 + 8;   //这里可以调节游戏难度
 		createObstacle(PxTransform(PxVec3(obstacleP, 0, stackZ -= obstacleDistance)), 2.0f);
 	}
 
@@ -284,12 +277,6 @@ void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch (toupper(key))
 	{
-
-	/*case 'R':
-		stackZ = 12.0f;
-		cleanupPhysics(true);
-		initPhysics(true);
-		break;*/
 	case 'G':
 		GAME_START = true;
 		break;

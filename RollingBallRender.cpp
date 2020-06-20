@@ -67,8 +67,6 @@ namespace
 		snprintf(s, sizeof(s), "%d", scoreValue);
 		Snippets::renderText(100, 450, s, 5);
 		
-
-
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene, 1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
@@ -101,8 +99,6 @@ void renderLoop()
 	Snippets::setupDefaultWindow("RollingBall");
 	Snippets::setupDefaultRenderState();
 
-
-
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
 	glutKeyboardFunc(keyboardCallback);
@@ -115,6 +111,4 @@ void renderLoop()
 	s.playSound();//≤•∑≈“Ù¿÷
 	initPhysics(true);
 	glutMainLoop();
-
-	
 }
