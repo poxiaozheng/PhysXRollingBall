@@ -61,17 +61,17 @@ namespace
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
 		//历史最高分
-		Snippets::renderText(10, 475, "LastHighestScore: ", 30);
+		Snippets::renderText(10, 475, "LastHighestScore: ", 19);
 		snprintf(s1, sizeof(s), "%d", lastHighestScore);
-		Snippets::renderText(200, 475, s1, 20);
+		Snippets::renderText(200, 475, s1, strlen(s1));
 
 		//按键说明
 		Snippets::renderText(10, 10, "Press G to go,Press A to left,Press D to right", 48);
 	
 		//当前游戏得分
-		Snippets::renderText(10, 450,"Score: ", 10);
+		Snippets::renderText(10, 450,"Score: ", 8);
 		snprintf(s, sizeof(s), "%d", scoreValue);
-		Snippets::renderText(100, 450, s, 5);
+		Snippets::renderText(100, 450, s, strlen(s));
 		
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene, 1);
