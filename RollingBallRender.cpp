@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <PxPhysicsAPI.h>
+#include <fstream>
 
 #include "Header/Utils/SnippetCamera.h"
 #include "Header/Utils/SnippetRender.h"
@@ -22,7 +23,9 @@ const char* GAME_OVER_TEXT = "GAME OVER";
 const int GAME_OVER_LENGTH = strlen(GAME_OVER_TEXT);
 char score[] = "Score: ";
 extern int scoreValue; //游戏得分
+int highscore;//排行榜分数
 char s[100]; //存放游戏得分数的char数组
+char s1[100];
 
 namespace
 {
@@ -62,7 +65,16 @@ namespace
 			tryIncreaseSpeed();
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
+
+		if (GAME_START == false && GAME_OVER == false)
+		{
+			
+			Snippets::renderText(10, 475, "HighScore: ", 15);
+			snprintf(s1, sizeof(s), "%d", highscore);
+			Snippets::renderText(150, 475, s1, 5);
+		}
 		Snippets::renderText(10, 10, "Press G to go,Press K to left,Press L to right", 48);
+	
 		Snippets::renderText(10, 450,score, 10);
 		snprintf(s, sizeof(s), "%d", scoreValue);
 		Snippets::renderText(100, 450, s, 5);
@@ -80,7 +92,15 @@ namespace
 		}
 		if (GAME_OVER)
 		{
+	
 			Snippets::renderGameOver(GAME_OVER_TEXT, GAME_OVER_LENGTH);
+			if (scoreValue >= highscore)
+			{
+				ofstream out("score.txt");//输出分数到文件
+				out << scoreValue;
+				out.close();
+			}
+			
 		}
 		Snippets::finishRender();
 	}
@@ -95,6 +115,10 @@ namespace
 void renderLoop()
 {
 	sCamera = new Snippets::Camera(PxVec3(-19.0f, 8.0f, 9.3f), PxVec3(0.0f, -0.6f, -1.3f));
+	
+	ifstream in("score.txt");//读取历史最高分
+	in >> highscore;
+	in.close();
 
 	Snippets::setupDefaultWindow("RollingBall");
 	Snippets::setupDefaultRenderState();
