@@ -66,7 +66,7 @@ namespace
 		}
 
 		//历史最高分
-		Snippets::renderText(10, 475, "LastHighestScore: ", 19);
+		Snippets::renderText(10, 475, "HighestScore: ", 15);
 		snprintf(s1, sizeof(s), "%d", lastHighestScore);
 		Snippets::renderText(200, 475, s1, strlen(s1));
 
