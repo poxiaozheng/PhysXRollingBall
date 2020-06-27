@@ -280,10 +280,10 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'G':
 		GAME_START = true;
 		break;
-	case 'K':
+	case 'A':
 		MoveBallLeftRight(0);
 		break;
-	case 'L':
+	case 'D':
 		MoveBallLeftRight(1);
 		break;
 	}

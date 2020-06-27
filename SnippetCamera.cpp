@@ -68,10 +68,10 @@ namespace Snippets
 		PxVec3 viewY = mDir.cross(PxVec3(0, 1, 0)).getNormalized();
 		switch (toupper(key))
 		{
-		case 'W':	mEye += front * speed;		break;
+		/*case 'W':	mEye += front * speed;		break;
 		case 'S':	mEye -= front * speed;		break;
 		case 'A':	mEye -= viewY * speed;		break;
-		case 'D':	mEye += viewY * speed;		break;
+		case 'D':	mEye += viewY * speed;		break;*/
 		default:							return false;
 		}
 		return true;

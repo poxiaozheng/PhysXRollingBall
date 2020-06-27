@@ -21,9 +21,8 @@ extern bool GAME_OVER;
 extern bool GAME_START;
 const char* GAME_OVER_TEXT = "GAME OVER";
 const int GAME_OVER_LENGTH = strlen(GAME_OVER_TEXT);
-char score[] = "Score: ";
 extern int scoreValue; //游戏得分
-int highscore;//排行榜分数
+int lastHighestScore;//排行榜分数
 char s[100]; //存放游戏得分数的char数组
 char s1[100];
 
@@ -31,10 +30,10 @@ namespace
 {
 	Snippets::Camera* sCamera;
 
-	void motionCallback(int x, int y)
+	/*void motionCallback(int x, int y)
 	{
 		sCamera->handleMotion(x, y);
-	}
+	}*/
 
 	void keyboardCallback(unsigned char key, int x, int y)
 	{
@@ -43,11 +42,6 @@ namespace
 
 		if (!sCamera->handleKey(key, x, y))
 			keyPress(key, sCamera->getTransform());
-	}
-
-	void mouseCallback(int button, int state, int x, int y)
-	{
-		sCamera->handleMouse(button, state, x, y);
 	}
 
 	void idleCallback()
@@ -66,16 +60,16 @@ namespace
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
-		if (GAME_START == false && GAME_OVER == false)
-		{
-			
-			Snippets::renderText(10, 475, "HighScore: ", 15);
-			snprintf(s1, sizeof(s), "%d", highscore);
-			Snippets::renderText(150, 475, s1, 5);
-		}
-		Snippets::renderText(10, 10, "Press G to go,Press K to left,Press L to right", 48);
+		//历史最高分
+		Snippets::renderText(10, 475, "LastHighestScore: ", 30);
+		snprintf(s1, sizeof(s), "%d", lastHighestScore);
+		Snippets::renderText(200, 475, s1, 20);
+
+		//按键说明
+		Snippets::renderText(10, 10, "Press G to go,Press A to left,Press D to right", 48);
 	
-		Snippets::renderText(10, 450,score, 10);
+		//当前游戏得分
+		Snippets::renderText(10, 450,"Score: ", 10);
 		snprintf(s, sizeof(s), "%d", scoreValue);
 		Snippets::renderText(100, 450, s, 5);
 		
@@ -94,7 +88,7 @@ namespace
 		{
 	
 			Snippets::renderGameOver(GAME_OVER_TEXT, GAME_OVER_LENGTH);
-			if (scoreValue >= highscore)
+			if (scoreValue >= lastHighestScore)
 			{
 				ofstream out("score.txt");//输出分数到文件
 				out << scoreValue;
@@ -117,7 +111,7 @@ void renderLoop()
 	sCamera = new Snippets::Camera(PxVec3(-19.0f, 8.0f, 9.3f), PxVec3(0.0f, -0.6f, -1.3f));
 	
 	ifstream in("score.txt");//读取历史最高分
-	in >> highscore;
+	in >> lastHighestScore;
 	in.close();
 
 	Snippets::setupDefaultWindow("RollingBall");
@@ -126,9 +120,9 @@ void renderLoop()
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
 	glutKeyboardFunc(keyboardCallback);
-	glutMouseFunc(mouseCallback);
-	glutMotionFunc(motionCallback);
-	motionCallback(0, 0);
+	//glutMouseFunc(mouseCallback);
+	//glutMotionFunc(motionCallback);
+	//motionCallback(0, 0);
 
 	atexit(exitCallback);
 	Sound s;
