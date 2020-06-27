@@ -60,6 +60,11 @@ namespace
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
+		if (scoreValue > lastHighestScore)
+		{
+			lastHighestScore = scoreValue;
+		}
+
 		//历史最高分
 		Snippets::renderText(10, 475, "LastHighestScore: ", 19);
 		snprintf(s1, sizeof(s), "%d", lastHighestScore);
@@ -86,15 +91,12 @@ namespace
 		}
 		if (GAME_OVER)
 		{
-	
+
 			Snippets::renderGameOver(GAME_OVER_TEXT, GAME_OVER_LENGTH);
-			if (scoreValue >= lastHighestScore)
-			{
-				ofstream out("score.txt");//输出分数到文件
-				out << scoreValue;
-				out.close();
-			}
-			
+
+			ofstream out("score.txt");//输出分数到文件
+			out << lastHighestScore;
+			out.close();
 		}
 		Snippets::finishRender();
 	}
