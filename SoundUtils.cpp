@@ -16,7 +16,7 @@ bool checkFileExists(const char* filePath)
 
 int Sound::playSound()
 {
-	if (checkFileExists("D:/test.waw"))
+	if (checkFileExists("D:/test.wav"))
 	{
 		PlaySound(TEXT("D:/test.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	}
